@@ -12,10 +12,9 @@ public:
 private:
 	
 	std::array<uint8_t, 176> roundKeys; // initial addKey K0. then the keys for all 10 rounds K1 - K10. 11 K's in total each needs 16 bytes 11 * 16 = 176
-	std::uint8_t aesMod[2];
 	void keyExpansion(const uint8_t key[16]);
-	void subWord(const uint8_t in[4]);
-	void rotWord(const uint8_t in[4]);
+	std::array<uint8_t, 4> subWord(std::array<uint8_t, 4> w) const;
+	std::array<uint8_t, 4> rotWord(std::array<uint8_t, 4> w) const;
 	void addRoundKey(uint8_t state[16], int round) const;
 	void substituteBytes(uint8_t state[16]) const;
 	void shiftRows(uint8_t state[16]) const;
