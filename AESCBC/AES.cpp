@@ -138,17 +138,69 @@ void AES128::shiftRows(uint8_t state[16]) const {
 	state[15] = temp[11];
 }
 
-void AES128::printState(const uint8_t state[16], const std::string& label = " ") const {
+void AES128::printState(const uint8_t state[16], const std::string& label) const {
 	cout << "\n" << label << endl;
 	int index = 0;
 	for (int row = 0; row < 4; row++) {
 		for (int col = 0; col < 4; col++) {
 			index = row + (4 * col);
-			cout << "Row " << row << ": " << state[index] << " ";
+			cout << " " << hex << setw(2) << setfill('0') << (int)state[index] << " ";
 
 		}
 		cout << endl;
 	}
+}
+void AES128::printBlock(const uint8_t block[16], const std::string& label) const {
+	cout << endl << label << ": ";
+	for (int i = 0; i < 16; ++i) {
+		cout << hex << setw(2) << setfill('0') << (int)block[i] << " ";
+	}
+	cout << dec << endl;
+}
+
+void AES128::mixColumns(uint8_t state[16]) const {
+	for (int c = 0; c < 4; ++c) {
+		int col = 4 * c;
+
+		uint8_t s0 = state[col + 0];
+		uint8_t s1 = state[col + 1];
+		uint8_t s2 = state[col + 2];
+		uint8_t s3 = state[col + 3];
+
+		state[col + 0] = mul(s0, 0x02) ^ mul(s1, 0x03) ^ s2 ^ s3;
+		state[col + 1] = s0 ^ mul(s1, 0x02) ^ mul(s2, 0x03) ^ s3;
+		state[col + 2] = s0 ^ s1 ^ mul(s2, 0x02) ^ mul(s3, 0x03);
+		state[col + 3] = mul(s0, 0x03) ^ s1 ^ s2 ^ mul(s3, 0x02);
+
+		
+	}
+}
+
+void AES128::encryptBlock(uint8_t in[16], uint8_t out[16]) const {
+	uint8_t state[16];
+	memcpy(state, in, 16);
+	printState(state, "Initial State");
+	addRoundKey(state, 0);
+	printState(state, "After Adding Round 0 key");
+	int round = 1;
+	for (round; round < 10; ++round) {
+		cout << endl << "Round " << round << endl;
+		substituteBytes(state);
+		printState(state,"After SubBytes");
+		shiftRows(state);
+		printState(state,"After ShiftRows");
+		mixColumns(state);
+		printState(state,"After MixColumns");
+		addRoundKey(state, round);
+	}
+	substituteBytes(state);
+	printState(state,"After Final SubBytes");
+	shiftRows(state);
+	printState(state, "After Final ShiftRows");
+	addRoundKey(state, round);
+	printState(state, "After Final Round Key Addition");
+
+	memcpy(out, state, 16);
 }
 
 uint8_t AES128::xtime(uint8_t x) {
