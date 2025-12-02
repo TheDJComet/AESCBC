@@ -42,7 +42,7 @@ int main() {
         cout << hex << setw(2) << setfill('0') << (int)ciphertext[i] << " ";
 
     }
-    ofstream outFile("outputComparison.txt");
+    ofstream outFile("output.txt");
     if (outFile.is_open()) {
         for (int i = 0; i < ciphertext.size(); ++i) {
             outFile << hex << setw(2) << setfill('0') << (int)ciphertext[i] << " ";
