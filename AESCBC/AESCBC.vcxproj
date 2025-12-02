@@ -124,10 +124,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AES.hpp" />
+    <ClInclude Include="CBC.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AES.cpp" />
     <ClCompile Include="AESDriver.cpp" />
+    <ClCompile Include="CBC.cpp" />
+    <ClCompile Include="FinalProj.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="output.txt" />
+    <Text Include="outputComparison.txt" />
+    <Text Include="plaintext.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

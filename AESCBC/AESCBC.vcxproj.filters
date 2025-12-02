@@ -18,6 +18,9 @@
     <ClInclude Include="AES.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CBC.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AES.cpp">
@@ -26,5 +29,22 @@
     <ClCompile Include="AESDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CBC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FinalProj.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="output.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="plaintext.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="outputComparison.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

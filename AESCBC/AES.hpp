@@ -9,6 +9,7 @@ public:
 	AES128(const std::array<uint8_t, 16>& key); //constructor
 	void printBlock(const uint8_t block[16], const std::string& label) const;
 	void encryptBlock(uint8_t in[16], uint8_t out[16]) const;
+	
 	//void decryptBlock(uint8_t in[16], uint8_t out[16]) const;
 private:
 	

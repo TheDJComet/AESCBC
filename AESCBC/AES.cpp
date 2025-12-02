@@ -52,6 +52,8 @@ AES128::AES128(const array<uint8_t, 16>& key){
 	keyExpansion(key.data());
 }
 
+
+
 array<uint8_t, 4> AES128::rotWord(array<uint8_t, 4> w) const {
 	array <uint8_t, 4> rotatedWord = { w[1],w[2],w[3],w[0] };
 	

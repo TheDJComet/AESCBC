@@ -4,7 +4,7 @@
 #include <array>
 #include "AES.hpp"
 using namespace std;
-
+/*
 int main() {
 
     // Example 128-bit key (you can change this)
@@ -36,3 +36,4 @@ int main() {
 
 	return 0;
 }
+*/
