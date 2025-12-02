@@ -14,8 +14,10 @@ int main() {
         0x88, 0x99, 0xaa, 0xbb,
         0xcc, 0xdd, 0xee, 0xff
     };
-    string textFromFile;
-    ifstream inFile("plaintext.txt");
+    string textFromFile,fileString;
+    cout << "File to encrypt: ";
+    cin >> fileString;
+    ifstream inFile(fileString);
     if (inFile.is_open()) {
         string line;
         while (getline(inFile, line)) {
