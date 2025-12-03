@@ -111,6 +111,12 @@ void AES128::substituteBytes(uint8_t state[16]) const {
 	}
 }
 
+void AES128::inverseSubstituteBytes(uint8_t state[16]) const {
+	for(int i = 0; i < 16; i++){
+		state[i] = inv_sbox[state[i]];
+	}
+}
+
 void AES128::shiftRows(uint8_t state[16]) const {
 	uint8_t temp[16];
 	memcpy(temp, state, 16);
@@ -138,6 +144,36 @@ void AES128::shiftRows(uint8_t state[16]) const {
 	state[7] = temp[3];
 	state[11] = temp[7];
 	state[15] = temp[11];
+}
+
+void AES128::inverseShiftRows(uint8_t state[16]) const {
+	uint8_t temp[16];
+	
+	memcpy(temp, state, 16);
+
+	//Row 0 - no shift
+	state[0] = temp[0];
+	state[4] = temp[4];
+	state[8] = temp[8];
+	state[12] = temp[12];
+
+	//Row 1 - decryption shift RIGHT 1
+	state[1] = temp[13];
+	state[5] = temp[1];
+	state[9] = temp[5];
+	state[13] = temp[9];
+
+	//Row 2 - shift RIGHT 2
+	state[2] = temp[10];
+	state[6] = temp[14];
+	state[10] = temp[2];
+	state[14] = temp[6];
+
+	//Row 3 - shift RIGHT 3
+	state[3] = temp[7];
+	state[7] = temp[11];
+	state[11] = temp[15];
+	state[15] = temp[3];
 }
 
 void AES128::printState(const uint8_t state[16], const std::string& label) const {
@@ -178,6 +214,26 @@ void AES128::mixColumns(uint8_t state[16]) const {
 	}
 }
 
+void AES128::inverseMixColumns(uint8_t state[16]) const {
+	for(int c = 0; c < 4; c++) {
+		int col = 4 * c;
+
+		uint8_t s0 = state[col + 0];
+		uint8_t s1 = state[col + 1];
+		uint8_t s2 = state[col + 2];
+		uint8_t s3 = state[col + 3];
+
+		state[col + 0] = 
+			mul(s0, 0x0e) ^ mul(s1, 0x0b) ^ mul(s2, 0x0d) ^ mul(s3, 0x09);
+		state[col + 1] =
+			mul(s0, 0x09) ^ mul(s1, 0x0e) ^ mul(s2, 0x0b) ^ mul(s3, 0x0d);
+		state[col + 2] =
+			mul(s0, 0x0d) ^ mul(s1, 0x09) ^ mul(s2, 0x0e) ^ mul(s3, 0x0b);
+		state[col + 3] = 
+			mul(s0, 0x0b) ^ mul(s1, 0x0d) ^ mul(s2, 0x09) ^ mul(s3, 0x0e);
+	}
+}
+
 void AES128::encryptBlock(uint8_t in[16], uint8_t out[16]) const {
 	uint8_t state[16];
 	memcpy(state, in, 16);
@@ -201,6 +257,47 @@ void AES128::encryptBlock(uint8_t in[16], uint8_t out[16]) const {
 	printState(state, "After Final ShiftRows");
 	addRoundKey(state, round);
 	printState(state, "After Final Round Key Addition");
+
+	memcpy(out, state, 16);
+}
+
+void AES128::decryptBlock(uint8_t in[16], uint8_t out[16]) const {
+	uint8_t state[16];
+
+	memcpy(state, in, 16);
+
+	printState(state, "Initial Ciphertext State: ");
+
+	//Initial AddRoundKey w/ last round key (10)
+	addRoundKey(state, 10);
+	printState(state, "After initial addRoundKey (10)");
+
+	//Remaining Rounds
+	for(int i = 9; i >= 1; i--){
+		cout << endl << "Inverse Round #" << i << endl;
+
+		inverseShiftRows(state);
+		printState(state, "After inverseShiftRows: ");
+
+		inverseSubstituteBytes(state);
+		printState(state, "After inverseSubstituteBytes: ");
+
+		addRoundKey(state, i);
+		printState(state, "After AddRoundKey: ");
+
+		inverseMixColumns(state);
+		printState(state, "After inverseMixColums: ");
+	}
+
+	//Round 0 - follows encryption pattern
+	inverseShiftRows(state);
+	printState(state, "After final inverseShiftRows: ");
+
+	inverseSubstituteBytes(state);
+	printState(state, "After final inverseSubstituteBytes: ");
+
+	addRoundKey(state, 0);
+	printState(state, "After final addRoundKey (Round 0): ");
 
 	memcpy(out, state, 16);
 }
@@ -229,6 +326,5 @@ uint8_t AES128::mul(uint8_t x, uint8_t by) {
 	}
 	return result;
 }
-
 
 
