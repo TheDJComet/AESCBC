@@ -29,10 +29,6 @@ int main() {
     else {
         cerr << "Unable to open file" << endl;
     }
-
-   
-
-    
     
 
     AESCBC test(key);
@@ -54,5 +50,20 @@ int main() {
     else {
         cerr << "Unable to open file" << endl;
     }
+
+    //CBC decryption
+
+    string ptxt = test.decryptStream(ciphertext);
+    cout << "\n\nRecovered Plaintext: \n";
+    cout << ptxt << "\n";
+
+    ofstream recovered("recoveredPlainText.txt");
+    if(recovered.is_open()) {
+        recovered << ptxt;
+        recovered.close();
+    } else {
+        cerr << "Unable to open recovered.txt for writing. :( " << endl;
+    }
+
 	return 0;
 }

@@ -95,3 +95,71 @@ vector<uint8_t> AESCBC::encryptStream(const std::string& plainText) {
 	}
 	return ciphertext;
 }
+
+std::string AESCBC::decryptStream(const std::vector<uint8_t>& cipherText) {
+	//Cipher text must be a multiple of 16 byte block size
+	if (cipherText.empty() || cipherText.size() % 16 != 0) {
+		cerr << "Invalid ciphertext length for CBC decryption. " << endl;
+		return " ";
+	}
+
+	const size_t blocks = cipherText.size() / 16;
+
+	std::string plainText;
+	plainText.reserve(cipherText.size()); //can't be bigger than this
+
+	uint8_t in[16]; //current ciphertext block
+	uint8_t decrypt[16]; //previous
+	uint8_t xored[16]; //P[i]
+
+	for(size_t i = 0; i < blocks; i++){
+
+		//load cipherblock into current
+		for(int j = 0; j < 16; j++){
+			in[j] = cipherText[i * 16 + j];
+		}
+
+		printBlocks(in, "CiphertextBlock C[" + std::to_string(i) + "] ");
+
+		//Block decryption
+		aes.decryptBlock(in, decrypt);
+		printBlocks(decrypt, "After block decryption C[" + std::to_string(i) + "]");
+
+		//XOR with IV or previous block 
+
+		if(i == 0){
+			for(int j = 0; j < 16; j++) {
+				xored[j] = decrypt[j] ^ initializationVector[j];
+			}
+		}else {
+			for(int j = 0; j < 16; j++) {
+				xored[j] = decrypt[j] ^ cipherText[(i - 1) * 16 + j];
+			}
+		}
+
+		printBlocks(xored, "Recovered plaintext block P[" + std::to_string(i) + "]");
+
+		//append to plaintext
+		for(int j = 0; j < 16; j++){
+			plainText.push_back(static_cast<char>(xored[j]));
+		}
+	}
+
+	//string pkcs#7 padding
+	if(!plainText.empty()){
+		uint8_t pad = static_cast<uint8_t>(plainText.back());
+
+		//assume encryption stream is correct
+		if(pad > 0 && pad <= 16 && plainText.size() >= pad){
+			plainText.resize(plainText.size() - pad);
+		}
+		else{
+			cerr << "Warning: invalid padding value (" << (int)pad << 
+			"), returning plaintext." << endl;
+
+			return plainText;
+		}
+	}
+
+	return plainText;
+}
